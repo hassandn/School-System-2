@@ -11,7 +11,7 @@ def create_user(username, password, first_name, last_name, national_id, email, g
             first_name=first_name,
             last_name=last_name,
             national_id=national_id,
-            registration_status=False,
+            registration_status='pending',
             email=email,
         )
         user.set_password(password)
