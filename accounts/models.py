@@ -10,7 +10,7 @@ class User(AbstractUser):
     )
     
     national_id = models.CharField(max_length=10, unique=True)
-    bio_grapht = models.TextField(null=True, blank=True)
+    biography = models.TextField(null=True, blank=True)
     location = models.PointField(null=True, blank=True)
     registration_status = models.CharField(choices=REGISTRATION_STATUS, max_length=7, default='pending')
     
