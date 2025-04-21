@@ -25,7 +25,6 @@ class UserManager:
             user.set_password(self.password)
             for user_group in self.group_names:
                 group = Group.objects.get(name=str(user_group))
-                # group = Group.objects.get(name=str(self.group_names))
                 group.user_set.add(user)
             
             user.save() 
@@ -47,8 +46,6 @@ class UserManager:
         except Exception as e:
             pass
         
-    @classmethod
-    def user_list(Cls):
-        get_user_model().objects.all()
+
             
              
