@@ -7,4 +7,13 @@ class UserCreateView(generics.CreateAPIView):
     serializer_class = UserSerializer
 
 
-# class StudentListView
+class UserListView(generics.UpdateAPIView):
+    pass
+    
+
+class UserListView(generics.ListAPIView):
+    """API view for users list view"""
+    serializer_class = UserSerializer
+    queryset = get_user_model().objects.filter(registration_status="Registered")
+    
+

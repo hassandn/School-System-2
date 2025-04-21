@@ -54,3 +54,19 @@ class UserSerializer(serializers.ModelSerializer):
         if any(char.isalpha() for char in data['national_id']):#check if national id has characters
             raise serializers.ValidationError("National ID must contain only digits.")
         return data
+    
+    def to_representation(self, instance):
+        user = super().to_representation(instance)
+        user["full_name"] = f"{instance.first_name} {instance.last_name}"
+        user_groups = []        
+    
+        for group in user["groups"]:
+            group_obj = Group.objects.get(id=group)
+            user_groups.append(group_obj.name)
+        user["groups_name"] = user_groups
+        
+        del user["groups"]
+        del user["first_name"]
+        del user["last_name"]
+        return user
+    

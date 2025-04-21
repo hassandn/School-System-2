@@ -35,14 +35,20 @@ class UserManager:
         except Exception as e:
             raise ValidationError(f"Error creating user: {str(e)}")
         
-    def update_user(username, first_name, last_name, location, email, group_names):
+    def update_user(self):
         try:
             get_user_model().objects.update(
-                username=username,
-                first_name=first_name,
-                last_name=last_name,
-                location=location,
-                email=email,
+                username=self.username,
+                first_name=self.first_name,
+                last_name=self.last_name,
+                location=self.location,
+                email=self.email,
             )
         except Exception as e:
             pass
+        
+    @classmethod
+    def user_list(Cls):
+        get_user_model().objects.all()
+            
+             
