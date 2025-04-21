@@ -43,16 +43,17 @@ class UserSerializer(serializers.ModelSerializer):
         return user
     
     def validate(self, data):
-        
-        if get_user_model().objects.filter(username=data['username']).exists():#check if the username is already taken
-            raise serializers.ValidationError("Username already exists.")
-        
-        if get_user_model().objects.filter(email=data['email']).exists():#check if the email is already taken
-            raise serializers.ValidationError("Email already exists.")
-        check_password_strength(data)
-        
-        if any(char.isalpha() for char in data['national_id']):#check if national id has characters
-            raise serializers.ValidationError("National ID must contain only digits.")
+        if 'username' in data:
+            if get_user_model().objects.filter(username=data['username']).exists():#check if the username is already taken
+                raise serializers.ValidationError("Username already exists.")
+        if 'email' in data:
+            if get_user_model().objects.filter(email=data['email']).exists():#check if the email is already taken
+                raise serializers.ValidationError("Email already exists.")
+        if 'password' in data:
+            check_password_strength(data)
+        if 'national_id' in data:
+            if any(char.isalpha() for char in data['national_id']):#check if national id has characters
+                raise serializers.ValidationError("National ID must contain only digits.")
         return data
     
     def to_representation(self, instance):
