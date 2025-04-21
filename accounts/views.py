@@ -1,9 +1,10 @@
 from rest_framework import generics
 from django.contrib.auth import get_user_model
-from .serializers import StudentSerializer
+from .serializers import UserSerializer
 
-User = get_user_model()
-class StudentCreateView(generics.CreateAPIView):
-    """    API view to create a new student user."""
-    serializer_class = StudentSerializer
+class UserCreateView(generics.CreateAPIView):
+    """API view to create a new student user."""
+    serializer_class = UserSerializer
 
+
+# class StudentListView
