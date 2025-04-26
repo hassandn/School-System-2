@@ -45,3 +45,11 @@ class UserView(APIView):
             return Response(serilizer.data, status=status.HTTP_204_NO_CONTENT)
         return Response(serilizer.errors, status=status.HTTP_400_BAD_REQUEST)
     
+    def delete(self, request, pk):
+        user = get_object_or_404(get_user_model(), pk=pk)
+        serializer = UserSerializer
+        if user.delete():
+            return Response({"message: user deleted succesfully"}, status=status.HTTP_204_NO_CONTENT)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+    
