@@ -1,41 +1,47 @@
-from rest_framework import generics
-from django.contrib.auth import get_user_model
-from .serializers import UserSerializer
-from rest_framework import mixins
+from .serializers import UserSerializer, UserDetailSerializer, UserUpdateSerializer
+from django.shortcuts import get_object_or_404, get_list_or_404
 from rest_framework.pagination import PageNumberPagination
-
+from django.contrib.auth import get_user_model
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.views import APIView
 
 class UserListViewPagination(PageNumberPagination):
     page_size = 10
     page_size_query_param = "page_size"
 
 
-class UserCreateView(generics.CreateAPIView, mixins.CreateModelMixin):
-    """API view to create a new student user."""
-    serializer_class = UserSerializer
+class UserView(APIView):
+    def get(self, request, pk=None):
+        if pk:#it's detial view
+            user = get_object_or_404(get_user_model(), pk=pk)
+            serializer = UserDetailSerializer(user)
+            return Response(serializer.data)
+        else:#it's list view
+            users = get_list_or_404(get_user_model())
+            serializer = UserSerializer(users, many=True)
+            return Response(serializer.data)
+       
+    def post(self, request):
+        serializer = UserSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
-
-class UserUpdateView(generics.UpdateAPIView, mixins.UpdateModelMixin):
-    serializer_class = UserSerializer
-    queryset = get_user_model().objects.all()
+    def put(self, request, pk):
+        user = get_user_model().objects.get(pk=pk)
+        serilizer = UserUpdateSerializer(user, data=request.data)
+        if serilizer.is_valid():
+            serilizer.save()
+            return Response(serilizer.data, status=status.HTTP_204_NO_CONTENT)
+        return Response(serilizer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    def get_serializer(self, *args, **kwargs):
-        kwargs['partial'] = True
-        return super().get_serializer(*args, **kwargs)
-
-
-class UserListView(generics.ListAPIView, mixins.ListModelMixin):
-    """API view for users list view"""
-    serializer_class = UserSerializer
-    pagination_class = UserListViewPagination
-    queryset = get_user_model().objects.filter(registration_status="Registered")
-
-
-class UserDetailView(generics.GenericAPIView, mixins.RetrieveModelMixin):
-    serializer_class = UserSerializer
-    queryset = get_user_model().objects.all()
-    
-    def get(self, request, *args, **kwargs):
-        return self.retrieve(request, *args, **kwargs)
-        
+    def patch(self, request, pk):
+        user = get_object_or_404(get_user_model(), pk=pk)
+        serilizer = UserUpdateSerializer(user, data=request.data, partial=True)        
+        if serilizer.is_valid():
+            serilizer.save()
+            return Response(serilizer.data, status=status.HTTP_204_NO_CONTENT)
+        return Response(serilizer.errors, status=status.HTTP_400_BAD_REQUEST)
     

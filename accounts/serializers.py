@@ -1,9 +1,8 @@
-from rest_framework import serializers
-from django.contrib.auth.models import Group
 from django.contrib.auth import get_user_model 
+from django.contrib.auth.models import Group
+from rest_framework import serializers
 from .helpers import UserManager
 import re
-
 
 def check_password_strength(data):#check if the password is strong enough
     
@@ -29,26 +28,19 @@ def check_password_strength(data):#check if the password is strong enough
             raise serializers.ValidarionError("password must not contain national id.")
       
 class UserSerializer(serializers.ModelSerializer):
+    """serilizer for validate show and create user"""
     groups = serializers.PrimaryKeyRelatedField(queryset=Group.objects.all(), many=True)
-    
     class Meta:
         model = get_user_model()
         fields = ['username', 'email', 'password', 'national_id','first_name', 'last_name', 'groups']
         extra_kwargs = {'password': {'write_only': True}}
     
     def create(self, validated_data):
-        print(validated_data['groups'])
         user = UserManager(validated_data['username'], validated_data['password'], validated_data['first_name'], validated_data['last_name'], validated_data['national_id'], validated_data['email'] , validated_data['groups'])
         user = user.create_user()
         return user
     
     def validate(self, data):
-        if 'username' in data:
-            if get_user_model().objects.filter(username=data['username']).exists():#check if the username is already taken
-                raise serializers.ValidationError("Username already exists.")
-        if 'email' in data:
-            if get_user_model().objects.filter(email=data['email']).exists():#check if the email is already taken
-                raise serializers.ValidationError("Email already exists.")
         if 'password' in data:
             check_password_strength(data)
         if 'national_id' in data:
@@ -57,17 +49,40 @@ class UserSerializer(serializers.ModelSerializer):
         return data
     
     def to_representation(self, instance):
-        user = super().to_representation(instance)
-        user["full_name"] = f"{instance.first_name} {instance.last_name}"
-        user_groups = []        
+        return UserManager.to_representation(user=super().to_representation(instance))
     
-        for group in user["groups"]:
-            group_obj = Group.objects.get(id=group)
-            user_groups.append(group_obj.name)
-        user["groups_name"] = user_groups
+    
+class UserDetailSerializer(serializers.ModelSerializer):
+    """serilizer for user detail view"""
+    class Meta:
+        model = get_user_model()
+        fields = ['username', 'email', 'national_id', 'first_name', 'last_name', 'groups', 'biography', 'location', 'registration_status', 'date_joined', 'last_login']
+
+    def to_representation(self, instance):
+        return UserManager.to_representation(user=super().to_representation(instance))
+    
+
+
+class UserUpdateSerializer(serializers.ModelSerializer):
+    """serilizer for updting users"""
+    class Meta:
+        model = get_user_model()
+        exclude = ['password', 'registration_status', 'user_permissions','is_staff', 'is_active', 'is_superuser', 'id']
         
-        del user["groups"]
-        del user["first_name"]
-        del user["last_name"]
+
+    def to_representation(self, instance):
+        user = super().to_representation(instance)
+        user['groups']=UserManager.get_groups_name(user)
         return user
-    
+        
+    def update(self, instance, validated_data):
+        groups = validated_data.pop('groups', None)  
+
+        instance = super().update(instance, validated_data) 
+
+        if groups is not None:
+            instance.groups.set(groups)  
+        instance.save()
+
+        return instance
+        

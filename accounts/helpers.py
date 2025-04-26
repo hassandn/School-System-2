@@ -33,18 +33,25 @@ class UserManager:
             raise ValidationError(f"Group '{self.group_names}' does not exist.")
         except Exception as e:
             raise ValidationError(f"Error creating user: {str(e)}")
+    
+    @staticmethod
+    def get_groups_name(user):
+        user_groups = []        
+    
+        for group in user["groups"]:
+            group_obj = Group.objects.get(id=group)
+            user_groups.append(group_obj.name)
+        return user_groups
+    
+    @staticmethod
+    def to_representation(user):
+        user["full_name"] = f"{user["first_name"]} {user["last_name"]}"
+        user["groups_name"] = UserManager.get_groups_name(user=user)
         
-    def update_user(self):
-        try:
-            get_user_model().objects.update(
-                username=self.username,
-                first_name=self.first_name,
-                last_name=self.last_name,
-                location=self.location,
-                email=self.email,
-            )
-        except Exception as e:
-            pass
+        del user["groups"]
+        del user["first_name"]
+        del user["last_name"]
+        return user
         
 
             
