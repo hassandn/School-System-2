@@ -19,7 +19,7 @@ class UserManager:
                 first_name=self.first_name,
                 last_name=self.last_name,
                 national_id=self.national_id,
-                registration_status='pending',
+                registration_status='Pending',
                 email=self.email,
             )
             user.set_password(self.password)
