@@ -52,7 +52,6 @@ class UserSerializer(serializers.ModelSerializer):
         if 'national_id' in data:
             if any(char.isalpha() for char in data['national_id']):#check if national id has characters
                 raise serializers.ValidationError("National ID must contain only digits.")
-        # if ['username', 'email', 'password', 'national_id', 'first_name', 'last_name', 'groups'] in data:
         if all(field  in data for field in self.fields):
             return data 
         else:
@@ -77,9 +76,8 @@ class UserUpdateSerializer(serializers.ModelSerializer):
     """serilizer for updting users"""
     class Meta:
         model = get_user_model()
-        exclude = ['password', 'registration_status', 'user_permissions','is_staff', 'is_active', 'is_superuser', 'id']
+        exclude = ['password', 'registration_status', 'user_permissions','is_staff', 'is_active', 'is_superuser', 'id', 'last_login', 'date_joined']
         
-
     def to_representation(self, instance):
         user = super().to_representation(instance)
         user['groups']=UserManager.get_groups_name(user)
@@ -87,12 +85,9 @@ class UserUpdateSerializer(serializers.ModelSerializer):
         
     def update(self, instance, validated_data):
         groups = validated_data.pop('groups', None)  
-
         instance = super().update(instance, validated_data) 
-
         if groups is not None:
             instance.groups.set(groups)  
         instance.save()
-
         return instance
         
