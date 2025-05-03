@@ -1,14 +1,11 @@
 from .serializers import UserSerializer, UserDetailSerializer, UserUpdateSerializer
-from django.shortcuts import get_object_or_404, get_list_or_404
 from rest_framework.pagination import PageNumberPagination
 from django.contrib.auth import get_user_model
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.views import APIView
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from .permissions import IsOwnerPermission
-from .filters import IsOwnerFilterBackend
 
 class UserListViewPagination(PageNumberPagination):
     page_size = 10
@@ -29,7 +26,9 @@ class UserView(viewsets.ModelViewSet):
     
     def get_serializer_class(self):
         if self.action in ['update', 'partial_update']:
-            return  UserUpdateSerializer
+            return UserUpdateSerializer
+        if self.action == 'retrieve':
+            return UserDetailSerializer
         return  UserSerializer            
             
     def destroy(self, request, *args, **kwargs):

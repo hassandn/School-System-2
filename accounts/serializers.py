@@ -68,8 +68,7 @@ class UserDetailSerializer(serializers.ModelSerializer):
         fields = ['username', 'email', 'national_id', 'first_name', 'last_name', 'groups', 'biography', 'location', 'registration_status', 'date_joined', 'last_login']
 
     def to_representation(self, instance):
-        return UserManager.to_representation(user=super().to_representation(instance))
-    
+        return UserManager.to_representation(user=super().to_representation(instance))   
 
 
 class UserUpdateSerializer(serializers.ModelSerializer):

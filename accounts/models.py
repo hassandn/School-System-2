@@ -12,7 +12,7 @@ class User(AbstractUser):
     national_id = models.CharField(max_length=10, unique=True)
     biography = models.TextField(null=True, blank=True)
     location = models.PointField(null=True, blank=True)
-    registration_status = models.CharField(choices=REGISTRATION_STATUS, max_length=14, default='pending')
+    registration_status = models.CharField(choices=REGISTRATION_STATUS, max_length=14, default='Pending')
     
     REQUIRED_FIELDS = ["password", "first_name", "last_name", "national_id"]
     
