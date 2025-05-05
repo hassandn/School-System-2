@@ -15,8 +15,17 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
         fields = ['username', 'email', 'password', 'national_id','first_name', 'last_name', 'groups']
-        extra_kwargs = {'password': {'write_only': True,
-                                     'help_text': 'it must have at least 8 characters and must have at least 1 special character, digit and uppercase letter.'}}
+        extra_kwargs = {'password':
+                        {'write_only': True,
+                        'required': True,
+                        'help_text': 'it must have at least 8 characters and must have at least 1 special character, digit and uppercase letter.'},
+                        'username': {'required': True},
+                        'first_name': {'required': True},
+                        'last_name': {'required': True},
+                        'national_id': {'required': True},
+                        'email': {'required': True},
+                        'groups': {'required': True},
+                        }
     
     def create(self, validated_data):
         user = UserManager(validated_data['username'], validated_data['password'], validated_data['first_name'], validated_data['last_name'], validated_data['national_id'], validated_data['email'] , validated_data['groups'])

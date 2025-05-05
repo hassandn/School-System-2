@@ -17,10 +17,10 @@ class UserView(viewsets.ModelViewSet):
 
     def get_permissions(self):
         if self.action in ['retrieve', 'destroy', 'update', 'partial_update']:
-            permission_classes  [IsOwnerPermission()]
+            self.permission_classes = [IsOwnerPermission]
         elif self.action == 'create':
-            permission_classes = [AllowAny()]
-        return [permission() for permission in permission_classes]
+            self.permission_classes = [AllowAny]
+        return [permission() for permission in self.permission_classes]
 
     def get_serializer_class(self):
         if self.action in ['update', 'partial_update']:
