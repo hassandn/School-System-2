@@ -1,8 +1,6 @@
 from .serializers import UserSerializer, UserDetailSerializer, UserUpdateSerializer
 from rest_framework.pagination import PageNumberPagination
 from django.contrib.auth import get_user_model
-from rest_framework.response import Response
-from rest_framework import status
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from .permissions import IsOwnerPermission
@@ -16,14 +14,14 @@ class UserView(viewsets.ModelViewSet):
     queryset = get_user_model().objects.all()
     serializer_class = UserSerializer
     pagination_class = UserListViewPagination
-    
+
     def get_permissions(self):
         if self.action in ['retrieve', 'destroy', 'update', 'partial_update']:
-            return [IsOwnerPermission()]
+            permission_classes  [IsOwnerPermission()]
         elif self.action == 'create':
-            return [AllowAny()]
-        return [IsAuthenticated()]
-    
+            permission_classes = [AllowAny()]
+        return [permission() for permission in permission_classes]
+
     def get_serializer_class(self):
         if self.action in ['update', 'partial_update']:
             return UserUpdateSerializer
@@ -31,8 +29,4 @@ class UserView(viewsets.ModelViewSet):
             return UserDetailSerializer
         return  UserSerializer            
             
-    def destroy(self, request, *args, **kwargs):
-         return Response(
-            {"message": f"user {self.request.user.username} deleted!"},
-            status=status.HTTP_204_NO_CONTENT
-        )
+
