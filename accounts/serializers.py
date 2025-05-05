@@ -15,7 +15,8 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
         fields = ['username', 'email', 'password', 'national_id','first_name', 'last_name', 'groups']
-        extra_kwargs = {'password': {'write_only': True}}
+        extra_kwargs = {'password': {'write_only': True,
+                                     'help_text': 'it must have at least 8 characters and must have at least 1 special character, digit and uppercase letter.'}}
     
     def create(self, validated_data):
         user = UserManager(validated_data['username'], validated_data['password'], validated_data['first_name'], validated_data['last_name'], validated_data['national_id'], validated_data['email'] , validated_data['groups'])
@@ -68,7 +69,7 @@ class UserDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
         fields = ['username', 'email', 'national_id', 'first_name', 'last_name', 'groups', 'biography', 'location', 'registration_status', 'date_joined', 'last_login']
-
+        
     def to_representation(self, instance):
         return UserManager.to_representation(user=super().to_representation(instance))   
 
@@ -78,7 +79,7 @@ class UserUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
         exclude = ['password', 'registration_status', 'user_permissions','is_staff', 'is_active', 'is_superuser', 'id', 'last_login', 'date_joined']
-        
+
     def to_representation(self, instance):
         user = super().to_representation(instance)
         user['groups']=UserManager.get_groups_name(user)
