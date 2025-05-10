@@ -107,6 +107,8 @@ DATABASES = {
 }
 
 AUTH_USER_MODEL = 'accounts.User'
+MEDIA_ROOT = str(BASE_DIR / 'media')
+MEDIA_URL = '/media/'
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
