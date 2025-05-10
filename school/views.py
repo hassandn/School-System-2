@@ -3,8 +3,9 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import GenericViewSet
 
 from accounts.permissions import IsAdminPermission, IsTeacherOfClassPermission
-from .models import School, Course, Class, Exercise
-from .serializers import SchoolSerializer, CourseSerializer, ClassSerializer, AddStudentSerializer, ExerciseSerializer
+from .models import School, Course, Class, Exercise, ExerciseAnswer
+from .serializers import SchoolSerializer, CourseSerializer, ClassSerializer, AddStudentSerializer, ExerciseSerializer, \
+    ExerciseAnswerSerializer
 
 
 class SchoolViewSet(viewsets.ModelViewSet):
@@ -51,5 +52,13 @@ class ExerciseViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = ExerciseSerializer
 
-    # def get_permissions(self):
-        # if self.action in ['update', 'partial_update', 'destroy', 'create']:
+    def get_permissions(self):
+        if self.action in ['create', 'update', 'partial_update', 'destroy']:
+            self.permission_classes = [IsAdminPermission | IsAuthenticated]
+        [permission() for permission in self.permission_classes]
+
+
+class ExerciseAnswerViewSet(viewsets.ModelViewSet):
+    queryset = ExerciseAnswer.objects.all()
+    permission_classes = [IsAuthenticated]
+    serializer_class = ExerciseAnswerSerializer

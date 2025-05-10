@@ -34,7 +34,7 @@ class Class(models.Model):
     
 class Exercise(models.Model):
     title = models.CharField(max_length=100)
-    description = models.TextField()
+    description = models.TextField(null=False, blank=False)
     classroom = models.ForeignKey(to=Class, on_delete=models.PROTECT)
     teacher = models.ForeignKey(to=get_user_model(), on_delete=models.PROTECT)
     date_created = models.DateTimeField(auto_now_add=True)
@@ -47,9 +47,12 @@ class Exercise(models.Model):
 
 class ExerciseAnswer(models.Model):
     title = models.CharField(max_length=100, null=False, blank=False)
-    description = models.TextField(null=True, blank=True)
+    description = models.TextField(null=False, blank=False)
     exercise = models.ForeignKey(to=Exercise, on_delete=models.PROTECT)
     author = models.ForeignKey(to=get_user_model(), on_delete=models.PROTECT)
+    file = models.FileField(null=True, blank=True, upload_to="answers")
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
 
+    def __str__(self):
+        return f"{self.exercise} - {self.author} -{self.author}"
