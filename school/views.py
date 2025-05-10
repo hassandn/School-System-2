@@ -62,3 +62,4 @@ class ExerciseAnswerViewSet(viewsets.ModelViewSet):
     queryset = ExerciseAnswer.objects.all()
     permission_classes = [IsAuthenticated]
     serializer_class = ExerciseAnswerSerializer
+

@@ -88,8 +88,12 @@ class ExerciseAnswerSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("file must be zip or pdf.")
 
     def validate(self, attrs):
-        print(attrs['exercise'].due_date)
         if attrs['exercise'].due_date >= timezone.now():
-            return  attrs
+            if attrs['exercise'].classroom.students.filter(id=self.context['request'].user.id).exists():
+                return attrs
+            else:
+                raise serializers.ValidationError("user must be student of class.")
+
         else:
             raise serializers.ValidationError("The deadline for submitting the exercise has passed.")
+
