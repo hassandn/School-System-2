@@ -19,7 +19,8 @@ class Course(models.Model):
     
     def __str__(self):
         return f"{self.course_name} - {self.credits}"
-    
+
+
 class Class(models.Model):
     class_name = models.CharField(max_length=100, blank=False, null=False)
     description = models.TextField(null=True, blank=True)
@@ -31,5 +32,18 @@ class Class(models.Model):
         return f"{self.class_name} - {self.course} - {self.teacher}"
     
     
+class Exercise(models.Model):
+    title = models.CharField(max_length=100)
+    description = models.TextField()
+    classroom = models.ForeignKey(to=Class, on_delete=models.PROTECT)
+    teacher = models.ForeignKey(to=get_user_model(), on_delete=models.PROTECT)
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_updated = models.DateTimeField(auto_now=True)
+    due_date = models.DateTimeField(null=True, blank=True)
 
-    
+    def __str__(self):
+        return f"{self.classroom} - {self.title[:15]}"
+
+
+
+

@@ -1,7 +1,8 @@
 from django.contrib.auth.models import Group
+from django.utils.http import escape_leading_slashes
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from school.models import School, Course, Class
+from school.models import School, Course, Class, Exercise
 
 
 class SchoolSerializer(serializers.ModelSerializer):
@@ -50,3 +51,22 @@ class AddStudentSerializer(serializers.ModelSerializer):
                     f"user {user.username} is not student."
                 )
         return value
+
+
+class ExerciseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Exercise
+        exclude = ['date_created', 'date_updated', 'teacher']
+
+    def validate(self, attrs):
+        user = self.context['request'].user
+        if user.groups.filter(name="Teacher").exists():
+            return attrs
+        else:
+            raise serializers.ValidationError("user must be teacher.")
+
+    def create(self, validated_data):
+        user = self.context['request'].user
+        validated_data['teacher'] = user
+        return super().create(validated_data)
+
