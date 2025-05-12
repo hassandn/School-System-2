@@ -1,12 +1,8 @@
-import datetime
 from datetime import timezone
-from traceback import print_tb
 
-from django.contrib.auth.models import Group
-from django.utils.http import escape_leading_slashes
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from school.models import School, Course, Class, Exercise, ExerciseAnswer
+from school.models import School, Course, Class, Exercise, ExerciseAnswer, Announcement
 from django.utils import timezone
 
 class SchoolSerializer(serializers.ModelSerializer):
@@ -96,4 +92,26 @@ class ExerciseAnswerSerializer(serializers.ModelSerializer):
 
         else:
             raise serializers.ValidationError("The deadline for submitting the exercise has passed.")
+
+
+class AnnouncementSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Announcement
+        fields = '__all__'
+
+    def validate_classroom(self, value):
+        if value.teacher.username == self.context['request'].user.username:
+            return value
+        else:
+            raise serializers.ValidationError("کاربر معلم این کلاس نیست.")
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['views'] = instance.viewed_by.count()
+        del representation['viewed_by']
+        representation['author'] = get_user_model().objects.get(pk=representation['author']).username
+        representation['classroom'] = Class.objects.get(pk=representation['classroom']).class_name
+        return representation
+
+    
 
