@@ -8,6 +8,8 @@ from rest_framework import serializers
 from .helpers import UserManager
 import re
 
+from .servieces import UserLocationManage
+
 
 class UserSerializer(serializers.ModelSerializer):
     """serilizer for validate show and create user"""
@@ -101,4 +103,15 @@ class UserUpdateSerializer(serializers.ModelSerializer):
             instance.groups.set(groups)  
         instance.save()
         return instance
-        
+
+
+class NearestSchoolFromUser(serializers.ModelSerializer):
+    nearest_schools = serializers.SerializerMethodField()
+    class Meta:
+        model = get_user_model()
+        fields = 'nearest_schools'
+
+    def get_nearest_schools(self, obj):
+        return UserLocationManage.get_nearest_schools(self.context.user, count=3)
+
+

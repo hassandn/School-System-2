@@ -15,3 +15,10 @@ class IsAdminPermission(BasePermission):
 class IsTeacherOfClassPermission(BasePermission):
     def has_object_permission(self, request, view, obj):
         return request.user == obj.teacher
+
+class IsTecherPermission(BasePermission):
+    def has_permission(self, request, view):
+        return request.user.groups.filter(name='Teacher').exists()
+
+    def has_object_permission(self, request, view, obj):
+        return request.user.groups.filter(name='Teacher').exists()
