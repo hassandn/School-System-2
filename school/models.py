@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.gis.db import models
 from django.contrib.auth import get_user_model
+from django.db.models import ManyToManyField
 
 
 class School(models.Model):
@@ -56,3 +57,17 @@ class ExerciseAnswer(models.Model):
 
     def __str__(self):
         return f"{self.exercise} - {self.author} -{self.author}"
+
+
+class Announcement(models.Model):
+    title = models.CharField(max_length=100)
+    text = models.TextField()
+    author = models.ForeignKey(to=get_user_model(), on_delete=models.PROTECT)
+    classroom = models.ForeignKey(to=Class, on_delete=models.PROTECT)
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_updated = models.DateTimeField(auto_now=True)
+    viewed_by = models.ManyToManyField(to=get_user_model(), blank=True, related_name='viewed_by')
+
+    def __str__(self):
+        return f"{self.author} - {self.title[:15]}"
+

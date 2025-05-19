@@ -1,7 +1,7 @@
-from .serializers import UserSerializer, UserDetailSerializer, UserUpdateSerializer
+from .serializers import UserSerializer, UserDetailSerializer, UserUpdateSerializer, NearestSchoolFromUser
 from rest_framework.pagination import PageNumberPagination
 from django.contrib.auth import get_user_model
-from rest_framework import viewsets
+from rest_framework import viewsets, generics
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from .permissions import IsOwnerPermission
 
@@ -29,4 +29,9 @@ class UserView(viewsets.ModelViewSet):
             return UserDetailSerializer
         return  UserSerializer            
             
+
+class NearestSchool(generics.RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = get_user_model().objects.all()
+    serializer_class = NearestSchoolFromUser
 
